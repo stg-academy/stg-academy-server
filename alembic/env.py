@@ -4,11 +4,13 @@ from sqlalchemy import pool
 from alembic import context
 import os
 import sys
+import dotenv
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from models import Base
+from app.models.user import Base
 
+dotenv.load_dotenv()
 config = context.config
 
 if config.config_file_name is not None:
@@ -17,7 +19,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 def get_url():
-    return os.getenv("DATABASE_URL", "postgresql://user:password@localhost/stg_academy")
+    return os.getenv("DATABASE_URL", "postgresql://user:password@localhost/stgacademy")
 
 def run_migrations_offline() -> None:
     url = get_url()

@@ -1,4 +1,65 @@
+# 프로젝트 구조
 
+```
+fastapi-postgres-backend/
+├── app/
+│   ├── api/              # API 라우터
+│   │   ├── auth.py       # 인증 (회원가입, 로그인)
+│   │   └── users.py      # 사용자 CRUD
+│   ├── models/           # SQLAlchemy 모델
+│   │   └── user.py
+│   ├── schemas/          # Pydantic 스키마
+│   │   └── user.py
+│   ├── crud/             # 데이터베이스 작업
+│   │   └── user.py
+│   ├── utils/            # 유틸리티
+│   │   └── security.py   # JWT, 비밀번호 해싱
+│   ├── config.py         # 설정 관리
+│   ├── database.py       # DB 연결
+│   └── main.py           # 앱 진입점
+├── alembic/              # 마이그레이션
+├── requirements.txt
+├── .env.example
+└── README.md
+```
+
+```
+
+  생성된 파일 구조:
+  app/
+  ├── api/
+  │   ├── auth.py       # 카카오 로그인, JWT 인증
+  │   └── users.py      # 모든 CRUD API 엔드포인트
+  ├── models/
+  │   └── user.py       # 6개 테이블 SQLAlchemy 모델
+  ├── schemas/
+  │   └── user.py       # Pydantic 스키마 (Request/Response)
+  ├── crud/
+  │   └── user.py       # 데이터베이스 CRUD 작업
+  ├── utils/
+  │   └── security.py   # JWT, 패스워드 해싱
+  ├── config.py         # 환경 설정
+  ├── database.py       # DB 연결
+  └── main.py           # FastAPI 앱 진입점
+
+  주요 API 엔드포인트:
+
+  인증:
+  - GET /auth/kakao - 카카오 로그인 URL 생성
+  - GET /auth/kakao/callback - 카카오 콜백 처리
+  - GET /auth/me - 현재 사용자 정보
+  - POST /auth/logout - 로그아웃
+
+  CRUD 작업:
+  - Users: /api/users/*
+  - Courses: /api/courses/*
+  - Classes: /api/courses/{id}/classes/*, /api/classes/*
+  - Lectures: /api/classes/{id}/lectures/*, /api/lectures/*
+  - Attendances: /api/lectures/{id}/attendances/*, /api/attendances/*
+  - Certifications: /api/certifications/*, /api/users/{id}/certifications
+
+  모든 보호된 엔드포인트는 JWT 인증이 필요하며, 카카오 OAuth2 로그인이 구현되어 있습니다.
+```
 
 # DB 테이블 구조
 
