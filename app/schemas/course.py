@@ -17,7 +17,6 @@ class CourseUpdate(BaseModel):
     description: Optional[str] = None
     keyword: Optional[str] = None
     is_active: Optional[bool] = None
-    updated_by: str
 
 class CourseResponse(CourseBase):
     model_config = ConfigDict(from_attributes=True)

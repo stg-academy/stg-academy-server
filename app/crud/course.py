@@ -26,10 +26,13 @@ class CourseCRUD:
         return db_course
 
     @staticmethod
-    def update_course(db: Session, course_id: UUID, course_update: CourseUpdate) -> Optional[Course]:
+    def update_course(db: Session, course_id: UUID, course_update: CourseUpdate, user: User) -> Optional[Course]:
+        course_update_data = course_update.model_dump(exclude_unset=True)
+        course_update_data['updated_by'] = user.id
+
         db_course = db.query(Course).filter(Course.id == course_id).first()
         if db_course:
-            for field, value in course_update.model_dump(exclude_unset=True).items():
+            for field, value in course_update_data.items():
                 setattr(db_course, field, value)
             db.commit()
             db.refresh(db_course)

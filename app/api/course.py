@@ -44,7 +44,7 @@ async def update_course(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
-    course = CourseCRUD.update_course(db, course_id, course_update)
+    course = CourseCRUD.update_course(db, course_id, course_update, current_user)
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
     return course
