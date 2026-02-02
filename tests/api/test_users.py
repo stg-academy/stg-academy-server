@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from uuid import uuid4
 
-from app.models.user import User, Course, Class, Lecture, Attendance, Certification
+from app.models.user import User, Course, Session, Lecture, Attendance, Certification
 from app.utils.security import create_access_token
 
 
@@ -171,8 +171,8 @@ class TestCourseCRUD:
         assert data["title"] == "Updated Title"
 
 
-class TestClassCRUD:
-    def test_create_class(self, client: TestClient, db_session, auth_headers):
+class TestSessionCRUD:
+    def test_create_session(self, client: TestClient, db_session, auth_headers):
         headers, user = auth_headers
 
         # Create course first
@@ -186,25 +186,25 @@ class TestClassCRUD:
         db_session.commit()
         db_session.refresh(course)
 
-        class_data = {
-            "title": "Test Class",
+        session_data = {
+            "title": "Test Session",
             "lecturer_info": "Test Lecturer",
-            "created_by": str(user.id)
+            "course_id": str(course.id)
         }
 
-        response = client.post(f"/api/courses/{course.id}/classes", json=class_data, headers=headers)
+        response = client.post("/api/sessions", json=session_data, headers=headers)
 
         if response.status_code != 200:
             print(f"Error response: {response.json()}")
         assert response.status_code == 200
         data = response.json()
-        assert data["title"] == "Test Class"
+        assert data["title"] == "Test Session"
         assert data["course_id"] == str(course.id)
 
-    def test_get_classes_by_course(self, client: TestClient, db_session, auth_headers):
+    def test_get_sessions_by_course(self, client: TestClient, db_session, auth_headers):
         headers, user = auth_headers
 
-        # Create course and classes
+        # Create course and sessions
         course = Course(
             title="Test Course",
             created_by=str(user.id),
@@ -216,17 +216,17 @@ class TestClassCRUD:
         db_session.refresh(course)
 
         for i in range(2):
-            class_obj = Class(
+            session_obj = Session(
                 course_id=course.id,
-                title=f"Class {i}",
+                title=f"Session {i}",
                 created_by=str(user.id),
                 updated_by=str(user.id),
                 is_active=True
             )
-            db_session.add(class_obj)
+            db_session.add(session_obj)
         db_session.commit()
 
-        response = client.get(f"/api/courses/{course.id}/classes")
+        response = client.get("/api/sessions")
 
         assert response.status_code == 200
         data = response.json()
@@ -237,7 +237,7 @@ class TestLectureCRUD:
     def test_create_lecture(self, client: TestClient, db_session, auth_headers):
         headers, user = auth_headers
 
-        # Create course and class
+        # Create course and session
         course = Course(
             title="Test Course",
             created_by=str(user.id),
@@ -248,47 +248,47 @@ class TestLectureCRUD:
         db_session.commit()
         db_session.refresh(course)
 
-        class_obj = Class(
+        session_obj = Session(
             course_id=course.id,
-            title="Test Class",
+            title="Test Session",
             created_by=str(user.id),
             updated_by=str(user.id),
             is_active=True
         )
-        db_session.add(class_obj)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
         lecture_data = {
             "title": "Test Lecture",
             "sequence": 1,
-            "created_by": str(user.id)
+            "session_id": str(session_obj.id)
         }
 
-        response = client.post(f"/api/classes/{class_obj.id}/lectures", json=lecture_data, headers=headers)
+        response = client.post("/api/lectures", json=lecture_data, headers=headers)
 
         assert response.status_code == 200
         data = response.json()
         assert data["title"] == "Test Lecture"
         assert data["sequence"] == 1
 
-    def test_get_lectures_by_class(self, client: TestClient, db_session, auth_headers):
+    def test_get_lectures_by_session(self, client: TestClient, db_session, auth_headers):
         headers, user = auth_headers
 
-        # Setup course, class, and lectures
+        # Setup course, session, and lectures
         course = Course(title="Test Course", created_by=str(user.id), updated_by=str(user.id), is_active=True)
         db_session.add(course)
         db_session.commit()
         db_session.refresh(course)
 
-        class_obj = Class(course_id=course.id, title="Test Class", created_by=str(user.id), updated_by=str(user.id), is_active=True)
-        db_session.add(class_obj)
+        session_obj = Session(course_id=course.id, title="Test Session", created_by=str(user.id), updated_by=str(user.id), is_active=True)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
         for i in range(2):
             lecture = Lecture(
-                class_id=class_obj.id,
+                session_id=session_obj.id,
                 title=f"Lecture {i}",
                 sequence=i+1,
                 created_by=str(user.id),
@@ -297,7 +297,7 @@ class TestLectureCRUD:
             db_session.add(lecture)
         db_session.commit()
 
-        response = client.get(f"/api/classes/{class_obj.id}/lectures")
+        response = client.get(f"/api/lectures/session/{session_obj.id}")
 
         assert response.status_code == 200
         data = response.json()
@@ -308,12 +308,15 @@ class TestAttendanceCRUD:
     def test_create_attendance(self, client: TestClient, db_session, auth_headers):
         headers, user = auth_headers
 
-        # Setup course, class, and lecture
+        # Setup course, session, and lecture
         course = Course(title="Test Course", created_by=str(user.id), updated_by=str(user.id), is_active=True)
-        class_obj = Class(course_id=course.id, title="Test Class", created_by=str(user.id), updated_by=str(user.id), is_active=True)
-        lecture = Lecture(class_id=class_obj.id, title="Test Lecture", sequence=1, created_by=str(user.id), updated_by=str(user.id))
-
-        db_session.add_all([course, class_obj, lecture])
+        db_session.add(course)
+        db_session.commit()
+        session_obj = Session(course_id=course.id, title="Test Session", created_by=str(user.id), updated_by=str(user.id), is_active=True)
+        db_session.add(session_obj)
+        db_session.commit()
+        lecture = Lecture(session_id=session_obj.id, title="Test Lecture", sequence=1, created_by=str(user.id), updated_by=str(user.id))
+        db_session.add(lecture)
         db_session.commit()
         db_session.refresh(lecture)
 

@@ -35,11 +35,11 @@ class TestCourse(Base):
     updated_by = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
-    classes = relationship("TestClass", back_populates="course")
+    sessions = relationship("TestSession", back_populates="course")
     certifications = relationship("TestCertification", back_populates="course")
 
-class TestClass(Base):
-    __tablename__ = "test_classes"
+class TestSession(Base):
+    __tablename__ = "test_sessions"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     course_id = Column(String, ForeignKey("test_courses.id"), nullable=False)
@@ -54,14 +54,14 @@ class TestClass(Base):
     updated_by = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
-    course = relationship("TestCourse", back_populates="classes")
-    lectures = relationship("TestLecture", back_populates="class_")
+    course = relationship("TestCourse", back_populates="sessions")
+    lectures = relationship("TestLecture", back_populates="session")
 
 class TestLecture(Base):
     __tablename__ = "test_lectures"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    class_id = Column(String, ForeignKey("test_classes.id"), nullable=False)
+    session_id = Column(String, ForeignKey("test_sessions.id"), nullable=False)
     title = Column(String, nullable=False)
     sequence = Column(Integer, nullable=False)
     attendance_type = Column(String)
@@ -71,7 +71,7 @@ class TestLecture(Base):
     updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now(), onupdate=func.now())
     updated_by = Column(String, nullable=False)
 
-    class_ = relationship("TestClass", back_populates="lectures")
+    session = relationship("TestSession", back_populates="lectures")
     attendances = relationship("TestAttendance", back_populates="lecture")
 
 class TestAttendance(Base):
@@ -98,7 +98,7 @@ class TestCertification(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     course_id = Column(String, ForeignKey("test_courses.id"), nullable=False)
     user_id = Column(String, ForeignKey("test_users.id"), nullable=False)
-    class_ids = Column(JSON)  # SQLite에서 JSON 사용
+    session_ids = Column(JSON)  # SQLite에서 JSON 사용
     issued_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
     created_by = Column(String, nullable=False)

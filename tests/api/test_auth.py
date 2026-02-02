@@ -41,7 +41,7 @@ class TestKakaoAuth:
         mock_client_instance.get.return_value = mock_user_response
         mock_client.return_value.__aenter__.return_value = mock_client_instance
 
-        response = client.get("/auth/kakao/callback?code=test_code")
+        response = client.get("/auth/kakao/login?code=test_code")
 
         assert response.status_code == 200
         data = response.json()
@@ -86,7 +86,7 @@ class TestKakaoAuth:
         mock_client_instance.get.return_value = mock_user_response
         mock_client.return_value.__aenter__.return_value = mock_client_instance
 
-        response = client.get("/auth/kakao/callback?code=test_code")
+        response = client.get("/auth/kakao/login?code=test_code")
 
         assert response.status_code == 200
         data = response.json()
@@ -101,7 +101,7 @@ class TestKakaoAuth:
         mock_client_instance.post.return_value = mock_token_response
         mock_client.return_value.__aenter__.return_value = mock_client_instance
 
-        response = client.get("/auth/kakao/callback?code=test_code")
+        response = client.get("/auth/kakao/login?code=test_code")
 
         assert response.status_code == 400
         assert "Failed to get access token" in response.json()["detail"]

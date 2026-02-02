@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from uuid import uuid4
 
-from app.models.user import User, Course, Class, Lecture, Attendance, Certification
+from app.models.user import User, Course, Session, Lecture, Attendance, Certification
 
 
 class TestUserModel:
@@ -76,34 +76,34 @@ class TestCourseModel:
         assert course.created_at is not None
         assert course.updated_at is not None
 
-    def test_course_class_relationship(self, db_session):
+    def test_course_session_relationship(self, db_session):
         course = Course(title="Test Course", created_by="admin", updated_by="admin", is_active=True)
         db_session.add(course)
         db_session.commit()
         db_session.refresh(course)
 
-        class_obj = Class(
+        session_obj = Session(
             course_id=course.id,
-            title="Test Class",
+            title="Test Session",
             created_by="admin",
             updated_by="admin",
             is_active=True
         )
-        db_session.add(class_obj)
+        db_session.add(session_obj)
         db_session.commit()
 
-        assert len(course.classes) == 1
-        assert course.classes[0].title == "Test Class"
+        assert len(course.sessions) == 1
+        assert course.sessions[0].title == "Test Session"
 
 
-class TestClassModel:
-    def test_create_class(self, db_session):
+class TestSessionModel:
+    def test_create_session(self, db_session):
         course = Course(title="Test Course", created_by="admin", updated_by="admin", is_active=True)
         db_session.add(course)
         db_session.commit()
         db_session.refresh(course)
 
-        class_obj = Class(
+        session_obj = Session(
             course_id=course.id,
             title="Advanced Python",
             lecturer_info="Dr. Smith",
@@ -113,30 +113,30 @@ class TestClassModel:
             is_active=True
         )
 
-        db_session.add(class_obj)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
-        assert class_obj.id is not None
-        assert class_obj.course_id == course.id
-        assert class_obj.title == "Advanced Python"
-        assert class_obj.lecturer_info == "Dr. Smith"
-        assert class_obj.date_info == "Monday-Wednesday"
-        assert class_obj.is_active is True
+        assert session_obj.id is not None
+        assert session_obj.course_id == course.id
+        assert session_obj.title == "Advanced Python"
+        assert session_obj.lecturer_info == "Dr. Smith"
+        assert session_obj.date_info == "Monday-Wednesday"
+        assert session_obj.is_active is True
 
-    def test_class_lecture_relationship(self, db_session):
+    def test_session_lecture_relationship(self, db_session):
         course = Course(title="Test Course", created_by="admin", updated_by="admin", is_active=True)
         db_session.add(course)
         db_session.commit()
         db_session.refresh(course)
 
-        class_obj = Class(course_id=course.id, title="Test Class", created_by="admin", updated_by="admin", is_active=True)
-        db_session.add(class_obj)
+        session_obj = Session(course_id=course.id, title="Test Session", created_by="admin", updated_by="admin", is_active=True)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
         lecture = Lecture(
-            class_id=class_obj.id,
+            session_id=session_obj.id,
             title="Introduction",
             sequence=1,
             created_by="admin",
@@ -145,8 +145,8 @@ class TestClassModel:
         db_session.add(lecture)
         db_session.commit()
 
-        assert len(class_obj.lectures) == 1
-        assert class_obj.lectures[0].title == "Introduction"
+        assert len(session_obj.lectures) == 1
+        assert session_obj.lectures[0].title == "Introduction"
 
 
 class TestLectureModel:
@@ -156,13 +156,13 @@ class TestLectureModel:
         db_session.commit()
         db_session.refresh(course)
 
-        class_obj = Class(course_id=course.id, title="Test Class", created_by="admin", updated_by="admin", is_active=True)
-        db_session.add(class_obj)
+        session_obj = Session(course_id=course.id, title="Test Session", created_by="admin", updated_by="admin", is_active=True)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
         lecture = Lecture(
-            class_id=class_obj.id,
+            session_id=session_obj.id,
             title="Variables and Data Types",
             sequence=1,
             attendance_type="mandatory",
@@ -175,7 +175,7 @@ class TestLectureModel:
         db_session.refresh(lecture)
 
         assert lecture.id is not None
-        assert lecture.class_id == class_obj.id
+        assert lecture.session_id == session_obj.id
         assert lecture.title == "Variables and Data Types"
         assert lecture.sequence == 1
         assert lecture.attendance_type == "mandatory"
@@ -189,12 +189,12 @@ class TestLectureModel:
         db_session.refresh(user)
         db_session.refresh(course)
 
-        class_obj = Class(course_id=course.id, title="Test Class", created_by="admin", updated_by="admin", is_active=True)
-        db_session.add(class_obj)
+        session_obj = Session(course_id=course.id, title="Test Session", created_by="admin", updated_by="admin", is_active=True)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
-        lecture = Lecture(class_id=class_obj.id, title="Test Lecture", sequence=1, created_by="admin", updated_by="admin")
+        lecture = Lecture(session_id=session_obj.id, title="Test Lecture", sequence=1, created_by="admin", updated_by="admin")
         db_session.add(lecture)
         db_session.commit()
         db_session.refresh(lecture)
@@ -223,12 +223,12 @@ class TestAttendanceModel:
         db_session.refresh(user)
         db_session.refresh(course)
 
-        class_obj = Class(course_id=course.id, title="Test Class", created_by="admin", updated_by="admin", is_active=True)
-        db_session.add(class_obj)
+        session_obj = Session(course_id=course.id, title="Test Session", created_by="admin", updated_by="admin", is_active=True)
+        db_session.add(session_obj)
         db_session.commit()
-        db_session.refresh(class_obj)
+        db_session.refresh(session_obj)
 
-        lecture = Lecture(class_id=class_obj.id, title="Test Lecture", sequence=1, created_by="admin", updated_by="admin")
+        lecture = Lecture(session_id=session_obj.id, title="Test Lecture", sequence=1, created_by="admin", updated_by="admin")
         db_session.add(lecture)
         db_session.commit()
         db_session.refresh(lecture)
@@ -268,7 +268,7 @@ class TestCertificationModel:
         certification = Certification(
             course_id=course.id,
             user_id=user.id,
-            class_ids=["class1", "class2"],
+            session_ids=["session1", "session2"],
             issued_at=datetime.utcnow(),
             created_by="admin",
             updated_by="admin"
@@ -281,5 +281,5 @@ class TestCertificationModel:
         assert certification.id is not None
         assert certification.course_id == course.id
         assert certification.user_id == user.id
-        assert certification.class_ids == ["class1", "class2"]
+        assert certification.session_ids == ["session1", "session2"]
         assert certification.issued_at is not None

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -9,7 +10,7 @@ from datetime import datetime
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.user import UserCreate, UserResponse
+from ..schemas.user import UserCreate, UserResponse, KakaoLoginRequest, KakaoLoginResponse
 from ..crud.user import UserCRUD
 from ..utils.security import create_access_token, verify_token
 from ..config import settings
@@ -25,10 +26,10 @@ async def kakao_login():
         f"client_id={settings.kakao_client_id}&"
         f"redirect_uri={settings.kakao_redirect_uri}"
     )
-    return {"auth_url": kakao_auth_url}
+    return RedirectResponse(url=kakao_auth_url, status_code=302)
 
-@router.get("/kakao/callback")
-async def kakao_callback(code: str, db: Session = Depends(get_db)):
+@router.post("/kakao/login", response_model=KakaoLoginResponse)
+async def kakao_login(request: KakaoLoginRequest, db: Session = Depends(get_db)):
     async with httpx.AsyncClient() as client:
         token_response = await client.post(
             "https://kauth.kakao.com/oauth/token",
@@ -37,8 +38,8 @@ async def kakao_callback(code: str, db: Session = Depends(get_db)):
                 "grant_type": "authorization_code",
                 "client_id": settings.kakao_client_id,
                 "client_secret": settings.kakao_client_secret,
-                "code": code,
-                "redirect_uri": settings.kakao_redirect_uri,
+                "code": request.code,
+                # "redirect_uri": settings.kakao_redirect_uri,
             }
         )
 
@@ -78,9 +79,12 @@ async def kakao_callback(code: str, db: Session = Depends(get_db)):
         access_token = create_access_token(data={"sub": str(user.id)})
 
         return {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user": UserResponse.model_validate(user)
+            "token": access_token,
+            "user": {
+                "id": str(user.id),
+                "nickname": user.username,
+                "email": None  # 카카오에서 이메일을 제공하지 않는 경우
+            }
         }
 
 @router.post("/logout")

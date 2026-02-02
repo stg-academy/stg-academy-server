@@ -35,11 +35,11 @@ class Course(Base):
     updated_by = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
-    classes = relationship("Class", back_populates="course")
+    sessions = relationship("Session", back_populates="course")
     certifications = relationship("Certification", back_populates="course")
 
-class Class(Base):
-    __tablename__ = "classes"
+class Session(Base):
+    __tablename__ = "sessions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     course_id = Column(UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False)
@@ -54,14 +54,14 @@ class Class(Base):
     updated_by = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
-    course = relationship("Course", back_populates="classes")
-    lectures = relationship("Lecture", back_populates="class_")
+    course = relationship("Course", back_populates="sessions")
+    lectures = relationship("Lecture", back_populates="session")
 
 class Lecture(Base):
     __tablename__ = "lectures"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    class_id = Column(UUID(as_uuid=True), ForeignKey("classes.id"), nullable=False)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("sessions.id"), nullable=False)
     title = Column(String, nullable=False)
     sequence = Column(Integer, nullable=False)
     attendance_type = Column(String)
@@ -71,7 +71,7 @@ class Lecture(Base):
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
     updated_by = Column(String, nullable=False)
 
-    class_ = relationship("Class", back_populates="lectures")
+    session = relationship("Session", back_populates="lectures")
     attendances = relationship("Attendance", back_populates="lecture")
 
 class Attendance(Base):
@@ -98,7 +98,7 @@ class Certification(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     course_id = Column(UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    class_ids = Column(JSONB)
+    session_ids = Column(JSONB)
     issued_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_by = Column(String, nullable=False)

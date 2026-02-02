@@ -1,3 +1,3 @@
-from .user import User, Course, Class, Lecture, Attendance, Certification
+from .user import User, Course, Session, Lecture, Attendance, Certification
 
-__all__ = ["User", "Course", "Class", "Lecture", "Attendance", "Certification"]
+__all__ = ["User", "Course", "Session", "Lecture", "Attendance", "Certification"]
