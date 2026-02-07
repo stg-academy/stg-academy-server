@@ -7,19 +7,21 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.user import UserResponse, UserUpdate
 from ..crud.user import UserCRUD
-from .auth import get_current_user
+from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/users", tags=["users"])
+
 
 @router.get("", response_model=List[UserResponse])
 async def get_users(
         skip: int = Query(0, ge=0),
         limit: int = Query(100, ge=1, le=1000),
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)  # admin 권한 요구
 ):
     users = UserCRUD.get_users(db, skip=skip, limit=limit)
     return users
+
 
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
@@ -32,6 +34,7 @@ async def get_user(
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 @router.put("/{user_id}", response_model=UserResponse)
 async def update_user(
         user_id: UUID,
@@ -43,6 +46,7 @@ async def update_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 @router.delete("/{user_id}")
 async def delete_user(

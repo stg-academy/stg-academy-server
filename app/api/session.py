@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.session import SessionCreate, SessionUpdate, SessionResponse
 from ..crud.session import SessionCRUD
-from .auth import get_current_user
+from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 

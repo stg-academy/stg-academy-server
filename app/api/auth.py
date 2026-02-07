@@ -1,22 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
-from typing import Optional
-from uuid import UUID
 import httpx
-import uuid
 from datetime import datetime
 
 from ..database import get_db
 from ..models.user import User
 from ..schemas.user import UserCreate, UserResponse, KakaoLoginRequest, KakaoLoginResponse
 from ..crud.user import UserCRUD
-from ..utils.security import create_access_token, verify_token
+from ..utils.auth import get_current_user
+from ..utils.security import create_access_token
 from ..config import settings
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
-security = HTTPBearer()
+
 
 @router.get("/kakao")
 async def kakao_login():
@@ -27,6 +25,7 @@ async def kakao_login():
         f"redirect_uri={settings.kakao_redirect_uri}"
     )
     return RedirectResponse(url=kakao_auth_url, status_code=302)
+
 
 @router.post("/kakao/login", response_model=KakaoLoginResponse)
 async def kakao_login(request: KakaoLoginRequest, db: Session = Depends(get_db)):
@@ -87,41 +86,11 @@ async def kakao_login(request: KakaoLoginRequest, db: Session = Depends(get_db))
             }
         }
 
+
 @router.post("/logout")
 async def logout():
     return {"message": "Successfully logged out"}
 
-def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: Session = Depends(get_db)
-) -> User:
-    token = credentials.credentials
-    payload = verify_token(token)
-
-    if payload is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    user_id = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    user = UserCRUD.get_user(db, UUID(user_id))
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return user
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):

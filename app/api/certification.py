@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.certification import CertificationCreate, CertificationUpdate, CertificationResponse
 from ..crud.certification import CertificationCRUD
-from .auth import get_current_user
+from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/api/certifications", tags=["certifications"])
 

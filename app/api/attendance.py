@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.attendance import AttendanceCreate, AttendanceUpdate, AttendanceResponse
 from ..crud.attendance import AttendanceCRUD
-from .auth import get_current_user
+from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/api/attendances", tags=["attendances"])
 

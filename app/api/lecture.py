@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.lecture import LectureCreate, LectureUpdate, LectureResponse
 from ..crud.lecture import LectureCRUD
-from .auth import get_current_user
+from ..utils.auth import get_current_user
 
 router = APIRouter(prefix="/api/lectures", tags=["lectures"])
 
