@@ -50,8 +50,8 @@ class Session(Base):
     end_date = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     created_by = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
-    updated_at = Column(DateTime(timezone=True), ForeignKey('users.id'), nullable=False, server_default=func.now(), onupdate=func.now())
-    updated_by = Column(UUID(as_uuid=True), nullable=False)
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    updated_by = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
     course = relationship("Course", back_populates="sessions")
