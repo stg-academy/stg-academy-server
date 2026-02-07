@@ -11,7 +11,7 @@ class CertificationCRUD:
 
     @staticmethod
     def get_certifications(db: Session, skip: int = 0, limit: int = 100) -> List[Certification]:
-        return db.query(Certification).offset(skip).limit(limit).all()
+        return db.query(Certification).order_by(Certification.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def get_certifications_by_user(db: Session, user_id: UUID) -> List[Certification]:

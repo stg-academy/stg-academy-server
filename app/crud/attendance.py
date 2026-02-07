@@ -11,7 +11,7 @@ class AttendanceCRUD:
 
     @staticmethod
     def get_attendances_by_lecture(db: Session, lecture_id: UUID, skip: int = 0, limit: int = 100) -> List[Attendance]:
-        return db.query(Attendance).filter(Attendance.lecture_id == lecture_id).offset(skip).limit(limit).all()
+        return db.query(Attendance).filter(Attendance.lecture_id == lecture_id).order_by(Attendance.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def create_attendance(db: Session, lecture_id: UUID, attendance: AttendanceCreate, user: User) -> Attendance:

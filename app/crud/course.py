@@ -11,7 +11,7 @@ class CourseCRUD:
 
     @staticmethod
     def get_courses(db: Session, skip: int = 0, limit: int = 100) -> List[Course]:
-        return db.query(Course).filter(Course.is_active == True).offset(skip).limit(limit).all()
+        return db.query(Course).filter(Course.is_active == True).order_by(Course.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def create_course(db: Session, course: CourseCreate, user: User) -> Course:

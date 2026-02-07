@@ -11,11 +11,11 @@ class LectureCRUD:
 
     @staticmethod
     def get_lectures(db: Session, skip: int = 0, limit: int = 100) -> List[Lecture]:
-        return db.query(Lecture).offset(skip).limit(limit).all()
+        return db.query(Lecture).order_by(Lecture.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def get_lectures_by_session(db: Session, session_id: UUID, skip: int = 0, limit: int = 100) -> List[Lecture]:
-        return db.query(Lecture).filter(Lecture.session_id == session_id).offset(skip).limit(limit).all()
+        return db.query(Lecture).filter(Lecture.session_id == session_id).order_by(Lecture.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def create_lecture(db: Session, lecture: LectureCreate, user: User) -> Lecture:

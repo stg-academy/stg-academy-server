@@ -19,7 +19,7 @@ class UserCRUD:
 
     @staticmethod
     def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[User]:
-        return db.query(User).offset(skip).limit(limit).all()
+        return db.query(User).order_by(User.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
     def create_user(db: Session, user: UserCreate) -> User:
