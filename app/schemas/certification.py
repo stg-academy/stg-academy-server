@@ -13,7 +13,7 @@ class CertificationCreate(CertificationBase):
 
 class CertificationUpdate(BaseModel):
     session_ids: Optional[List[str]] = None
-    updated_by: str
+    updated_by: UUID
 
 class CertificationResponse(CertificationBase):
     model_config = ConfigDict(from_attributes=True)
@@ -24,5 +24,5 @@ class CertificationResponse(CertificationBase):
     issued_at: datetime
     created_at: datetime
     updated_at: datetime
-    created_by: str
-    updated_by: str
+    created_by: UUID
+    updated_by: UUID

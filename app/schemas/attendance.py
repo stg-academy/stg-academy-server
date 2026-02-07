@@ -17,7 +17,7 @@ class AttendanceUpdate(BaseModel):
     detail_type: Optional[str] = None
     description: Optional[str] = None
     assignment_id: Optional[str] = None
-    updated_by: str
+    updated_by: UUID
 
 class AttendanceResponse(AttendanceBase):
     model_config = ConfigDict(from_attributes=True)
@@ -27,5 +27,5 @@ class AttendanceResponse(AttendanceBase):
     user_id: UUID
     created_at: datetime
     updated_at: datetime
-    created_by: str
-    updated_by: str
+    created_by: UUID
+    updated_by: UUID

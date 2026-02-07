@@ -5,7 +5,7 @@ from uuid import UUID
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.course import CourseCreate, CourseUpdate, CourseResponse
+from ..schemas.course import CourseCreate, CourseUpdate, CourseResponse, CourseInfoResponse
 from ..crud.course import CourseCRUD
 from ..utils.auth import get_current_user
 
@@ -19,7 +19,7 @@ async def create_course(
 ):
     return CourseCRUD.create_course(db, course, current_user)
 
-@router.get("", response_model=List[CourseResponse])
+@router.get("", response_model=List[CourseInfoResponse])
 async def get_courses(
         skip: int = Query(0, ge=0),
         limit: int = Query(100, ge=1, le=1000),

@@ -1,7 +1,8 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from uuid import UUID
-from ..models.user import Course, User
+from ..models.user import Course, User, Session as SessionModel
 from ..schemas.course import CourseCreate, CourseUpdate
 
 class CourseCRUD:
@@ -11,7 +12,32 @@ class CourseCRUD:
 
     @staticmethod
     def get_courses(db: Session, skip: int = 0, limit: int = 100) -> List[Course]:
-        return db.query(Course).filter(Course.is_active == True).order_by(Course.created_at.desc()).offset(skip).limit(limit).all()
+        courses = db.query(Course).filter(Course.is_active == True).order_by(Course.created_at.desc()).offset(skip).limit(limit).all()
+
+        results = (
+            db.query(
+                Course,
+                User.username.label('author'),
+                func.count(SessionModel.id).label('session_count')
+            )
+            .join(User, Course.created_by == User.id)
+            .outerjoin(SessionModel, Course.id == SessionModel.course_id)
+            .filter(Course.is_active == True)
+            .group_by(Course.id, User.username)
+            .order_by(Course.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+        courses = []
+        for course, author, lecture_count in results:
+            course.author = author
+            course.lecture_count = lecture_count
+            courses.append(course)
+
+        return courses
+
 
     @staticmethod
     def create_course(db: Session, course: CourseCreate, user: User) -> Course:

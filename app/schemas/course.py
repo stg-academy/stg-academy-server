@@ -24,5 +24,14 @@ class CourseResponse(CourseBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
-    created_by: str
-    updated_by: str
+    created_by: UUID
+    updated_by: UUID
+
+class CourseInfoResponse(CourseBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    author: str
+    lecture_count: int

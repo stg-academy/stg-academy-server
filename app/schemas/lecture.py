@@ -17,7 +17,7 @@ class LectureUpdate(BaseModel):
     sequence: Optional[int] = None
     attendance_type: Optional[str] = None
     lecture_date: Optional[datetime] = None
-    updated_by: str
+    updated_by: UUID
 
 class LectureResponse(LectureBase):
     model_config = ConfigDict(from_attributes=True)
@@ -26,5 +26,5 @@ class LectureResponse(LectureBase):
     session_id: UUID
     created_at: datetime
     updated_at: datetime
-    created_by: str
-    updated_by: str
+    created_by: UUID
+    updated_by: UUID

@@ -21,7 +21,7 @@ class SessionUpdate(BaseModel):
     begin_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     is_active: Optional[bool] = None
-    updated_by: str
+    updated_by: UUID
 
 class SessionResponse(SessionBase):
     model_config = ConfigDict(from_attributes=True)
@@ -30,5 +30,5 @@ class SessionResponse(SessionBase):
     course_id: UUID
     created_at: datetime
     updated_at: datetime
-    created_by: str
-    updated_by: str
+    created_by: UUID
+    updated_by: UUID
