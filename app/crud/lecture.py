@@ -15,7 +15,7 @@ class LectureCRUD:
 
     @staticmethod
     def get_lectures_by_session(db: Session, session_id: UUID, skip: int = 0, limit: int = 100) -> List[Lecture]:
-        return db.query(Lecture).filter(Lecture.session_id == session_id).order_by(Lecture.created_at.desc()).offset(skip).limit(limit).all()
+        return db.query(Lecture).filter(Lecture.session_id == session_id).order_by(Lecture.sequence).offset(skip).limit(limit).all()
 
     @staticmethod
     def create_lecture(db: Session, lecture: LectureCreate, user: User) -> Lecture:
@@ -30,10 +30,13 @@ class LectureCRUD:
         return db_lecture
 
     @staticmethod
-    def update_lecture(db: Session, lecture_id: UUID, lecture_update: LectureUpdate) -> Optional[Lecture]:
+    def update_lecture(db: Session, lecture_id: UUID, lecture_update: LectureUpdate, user: User) -> Optional[Lecture]:
+        lecture_dict = lecture_update.model_dump(exclude_unset=True)
+        lecture_dict['updated_by'] = str(user.id)
+
         db_lecture = db.query(Lecture).filter(Lecture.id == lecture_id).first()
         if db_lecture:
-            for field, value in lecture_update.model_dump(exclude_unset=True).items():
+            for field, value in lecture_dict.items():
                 setattr(db_lecture, field, value)
             db.commit()
             db.refresh(db_lecture)
@@ -42,6 +45,11 @@ class LectureCRUD:
     @staticmethod
     def delete_lecture(db: Session, lecture_id: UUID) -> bool:
         db_lecture = db.query(Lecture).filter(Lecture.id == lecture_id).first()
+
+        # attendance가 있으면 삭제 불가
+        if db_lecture and db_lecture.attendances:
+            return False
+
         if db_lecture:
             db.delete(db_lecture)
             db.commit()

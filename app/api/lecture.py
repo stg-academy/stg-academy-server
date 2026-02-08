@@ -53,7 +53,7 @@ async def update_lecture(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
-    lecture = LectureCRUD.update_lecture(db, lecture_id, lecture_update)
+    lecture = LectureCRUD.update_lecture(db, lecture_id, lecture_update, current_user)
     if not lecture:
         raise HTTPException(status_code=404, detail="Lecture not found")
     return lecture

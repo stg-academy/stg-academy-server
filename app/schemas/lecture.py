@@ -17,7 +17,6 @@ class LectureUpdate(BaseModel):
     sequence: Optional[int] = None
     attendance_type: Optional[str] = None
     lecture_date: Optional[datetime] = None
-    updated_by: UUID
 
 class LectureResponse(LectureBase):
     model_config = ConfigDict(from_attributes=True)

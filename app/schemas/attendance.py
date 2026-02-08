@@ -17,7 +17,6 @@ class AttendanceUpdate(BaseModel):
     detail_type: Optional[str] = None
     description: Optional[str] = None
     assignment_id: Optional[str] = None
-    updated_by: UUID
 
 class AttendanceResponse(AttendanceBase):
     model_config = ConfigDict(from_attributes=True)

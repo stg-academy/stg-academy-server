@@ -29,6 +29,15 @@ async def get_attendances_by_lecture(
 ):
     return AttendanceCRUD.get_attendances_by_lecture(db, lecture_id, skip=skip, limit=limit)
 
+@router.get("/sessions/{session_id}/attendances", response_model=List[AttendanceResponse])
+async def get_attendances_by_session(
+        session_id: UUID,
+        skip: int = Query(0, ge=0),
+        limit: int = Query(100, ge=1, le=1000),
+        db: Session = Depends(get_db)
+):
+    return AttendanceCRUD.get_attendances_by_session(db, session_id, skip=skip, limit=limit)
+
 @router.get("/{attendance_id}", response_model=AttendanceResponse)
 async def get_attendance(
         attendance_id: UUID,
@@ -46,7 +55,7 @@ async def update_attendance(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
 ):
-    attendance = AttendanceCRUD.update_attendance(db, attendance_id, attendance_update)
+    attendance = AttendanceCRUD.update_attendance(db, attendance_id, attendance_update, current_user)
     if not attendance:
         raise HTTPException(status_code=404, detail="Attendance not found")
     return attendance

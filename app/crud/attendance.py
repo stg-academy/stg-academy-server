@@ -14,6 +14,12 @@ class AttendanceCRUD:
         return db.query(Attendance).filter(Attendance.lecture_id == lecture_id).order_by(Attendance.created_at.desc()).offset(skip).limit(limit).all()
 
     @staticmethod
+    def get_attendances_by_session(db: Session, session_id: UUID, skip: int = 0, limit: int = 100) -> List[Attendance]:
+        from ..models.user import Lecture
+        lecture_ids = db.query(Lecture.id).filter(Lecture.session_id == session_id).subquery()
+        return db.query(Attendance).filter(Attendance.lecture_id.in_(lecture_ids)).order_by(Attendance.created_at.desc()).offset(skip).limit(limit).all()
+
+    @staticmethod
     def create_attendance(db: Session, lecture_id: UUID, attendance: AttendanceCreate, user: User) -> Attendance:
         attendance_dict = attendance.model_dump()
         attendance_dict['lecture_id'] = lecture_id
@@ -27,7 +33,10 @@ class AttendanceCRUD:
         return db_attendance
 
     @staticmethod
-    def update_attendance(db: Session, attendance_id: UUID, attendance_update: AttendanceUpdate) -> Optional[Attendance]:
+    def update_attendance(db: Session, attendance_id: UUID, attendance_update: AttendanceUpdate, user: User) -> Optional[Attendance]:
+        attendance_dict = attendance_update.model_dump(exclude_unset=True)
+        attendance_dict['updated_by'] = user.id
+
         db_attendance = db.query(Attendance).filter(Attendance.id == attendance_id).first()
         if db_attendance:
             for field, value in attendance_update.model_dump(exclude_unset=True).items():

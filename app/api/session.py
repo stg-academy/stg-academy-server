@@ -5,7 +5,7 @@ from uuid import UUID
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.session import SessionCreate, SessionUpdate, SessionResponse
+from ..schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionDetailResponse
 from ..crud.session import SessionCRUD
 from ..utils.auth import get_current_user
 
@@ -19,15 +19,15 @@ async def create_session(
 ):
     return SessionCRUD.create_session(db, session_data, current_user)
 
-@router.get("", response_model=List[SessionResponse])
+@router.get("", response_model=List[SessionDetailResponse])
 async def get_sessions(
         skip: int = Query(0, ge=0),
         limit: int = Query(100, ge=1, le=1000),
         db: Session = Depends(get_db)
 ):
-    return SessionCRUD.get_sessions(db, skip=skip, limit=limit)
+    return SessionCRUD.get_sessions_with_details(db, skip=skip, limit=limit)
 
-@router.get("/{session_id}", response_model=SessionResponse)
+@router.get("/{session_id}", response_model=SessionDetailResponse)
 async def get_session(
         session_id: UUID,
         db: Session = Depends(get_db)

@@ -21,6 +21,7 @@ class User(Base):
 
     attendances = relationship("Attendance", back_populates="user")
     certifications = relationship("Certification", back_populates="user")
+    enrollments = relationship("Enroll", back_populates="user")
 
 class Course(Base):
     __tablename__ = "courses"
@@ -44,6 +45,7 @@ class Session(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     course_id = Column(UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False)
     title = Column(String, nullable=False)
+    description = Column(Text)
     lecturer_info = Column(String)
     date_info = Column(String)
     begin_date = Column(DateTime(timezone=True))
@@ -56,6 +58,7 @@ class Session(Base):
 
     course = relationship("Course", back_populates="sessions")
     lectures = relationship("Lecture", back_populates="session")
+    enrollments = relationship("Enroll", back_populates="session")
 
 class Lecture(Base):
     __tablename__ = "lectures"
@@ -107,3 +110,18 @@ class Certification(Base):
 
     course = relationship("Course", back_populates="certifications")
     user = relationship("User", back_populates="certifications")
+
+class Enroll(Base):
+    __tablename__ = "enrollments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    session_id = Column(UUID(as_uuid=True), ForeignKey("sessions.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    created_by = Column(UUID(as_uuid=True), nullable=False)
+    updated_by = Column(UUID(as_uuid=True), nullable=False)
+    is_active = Column(Boolean, nullable=False, default=True)
+
+    user = relationship("User", back_populates="enrollments")
+    session = relationship("Session", back_populates="enrollments")

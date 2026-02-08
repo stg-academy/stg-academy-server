@@ -4,6 +4,7 @@ from .course import CourseCreate, CourseUpdate, CourseResponse
 from .lecture import LectureCreate, LectureUpdate, LectureResponse
 from .attendance import AttendanceCreate, AttendanceUpdate, AttendanceResponse
 from .certification import CertificationCreate, CertificationUpdate, CertificationResponse
+from .enroll import EnrollCreate, EnrollResponse, EnrollDetailResponse
 
 __all__ = [
     # User
@@ -18,4 +19,6 @@ __all__ = [
     "AttendanceCreate", "AttendanceUpdate", "AttendanceResponse",
     # Certification
     "CertificationCreate", "CertificationUpdate", "CertificationResponse",
+    # Enroll
+    "EnrollCreate", "EnrollResponse", "EnrollDetailResponse",
 ]

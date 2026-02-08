@@ -1,4 +1,4 @@
-from . import auth, user, course, session, lecture, attendance, certification
+from . import auth, user, course, session, lecture, attendance, certification, enroll
 
 __all__ = [
     "auth",
@@ -7,5 +7,6 @@ __all__ = [
     "session",
     "lecture",
     "attendance",
-    "certification"
+    "certification",
+    "enroll"
 ]
