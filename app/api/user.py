@@ -5,12 +5,20 @@ from uuid import UUID
 
 from ..database import get_db
 from ..models.user import User
-from ..schemas.user import UserResponse, UserUpdate
+from ..schemas.user import UserResponse, UserUpdate, UserInfoResponse
 from ..crud.user import UserCRUD
 from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
+@router.get("/info", response_model=List[UserInfoResponse])
+async def get_users_info(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    db: Session = Depends(get_db)
+):
+    users = UserCRUD.get_active_users(db, skip=skip, limit=limit)
+    return users
 
 @router.get("", response_model=List[UserResponse])
 async def get_users(

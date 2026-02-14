@@ -40,6 +40,10 @@ class UserCRUD:
         return db_user
 
     @staticmethod
+    def get_active_users(db: Session, skip: int = 0, limit: int = 100) -> List[User]:
+        return db.query(User).filter(User.is_active == True).order_by(User.created_at.desc()).offset(skip).limit(limit).all()
+
+    @staticmethod
     def delete_user(db: Session, user_id: UUID) -> bool:
         db_user = db.query(User).filter(User.id == user_id).first()
         if db_user:

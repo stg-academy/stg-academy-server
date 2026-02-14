@@ -1,14 +1,14 @@
 from .session import SessionCreate, SessionUpdate, SessionResponse
-from .user import UserCreate, UserUpdate, UserResponse
+from .user import UserCreate, UserUpdate, UserResponse, UserInfoResponse
 from .course import CourseCreate, CourseUpdate, CourseResponse
 from .lecture import LectureCreate, LectureUpdate, LectureResponse
 from .attendance import AttendanceCreate, AttendanceUpdate, AttendanceResponse
 from .certification import CertificationCreate, CertificationUpdate, CertificationResponse
-from .enroll import EnrollCreate, EnrollResponse, EnrollDetailResponse
+from .enroll import EnrollCreate, EnrollUpdate, EnrollResponse, EnrollDetailResponse
 
 __all__ = [
     # User
-    "UserCreate", "UserUpdate", "UserResponse",
+    "UserCreate", "UserUpdate", "UserResponse", "UserInfoResponse",
     # Course
     "CourseCreate", "CourseUpdate", "CourseResponse",
     # Session
@@ -20,5 +20,5 @@ __all__ = [
     # Certification
     "CertificationCreate", "CertificationUpdate", "CertificationResponse",
     # Enroll
-    "EnrollCreate", "EnrollResponse", "EnrollDetailResponse",
+    "EnrollCreate", "EnrollUpdate", "EnrollResponse", "EnrollDetailResponse",
 ]

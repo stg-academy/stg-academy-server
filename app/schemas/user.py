@@ -6,6 +6,7 @@ from uuid import UUID
 class UserBase(BaseModel):
     username: str
     auth_type: str
+    information: Optional[str] = None
     authorizations: Optional[Dict[str, Any]] = None
     is_active: bool = True
 
@@ -15,6 +16,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     username: Optional[str] = None
+    information: Optional[str] = None
     authorizations: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
 
@@ -32,3 +34,12 @@ class KakaoLoginRequest(BaseModel):
 class KakaoLoginResponse(BaseModel):
     token: str
     user: Dict[str, Any]
+
+class UserInfoResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    username: str
+    auth_type: str
+    information: Optional[str] = None
+    is_active: bool
