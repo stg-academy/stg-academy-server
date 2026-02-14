@@ -34,6 +34,37 @@ class KakaoLoginRequest(BaseModel):
 class KakaoLoginResponse(BaseModel):
     token: str
     user: Dict[str, Any]
+    requires_registration: bool
+
+class GeneralLoginRequest(BaseModel):
+    username: str
+    password: str
+
+class GeneralLoginResponse(BaseModel):
+    token: str
+    user: Dict[str, Any]
+
+class GeneralRegisterRequest(BaseModel):
+    username: str
+    password: str
+    display_name: str
+    information: str
+
+class GeneralRegisterResponse(BaseModel):
+    token: str
+    user: Dict[str, Any]
+
+class KakaoRegisterRequest(BaseModel):
+    username: str
+    information: str
+
+class KakaoRegisterResponse(BaseModel):
+    token: str
+    user: Dict[str, Any]
+
+class UsernameCheckResponse(BaseModel):
+    available: bool
+    message: str
 
 class UserInfoResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

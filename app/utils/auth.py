@@ -1,5 +1,6 @@
 import json
-from typing import List
+import bcrypt
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import Depends, HTTPException
@@ -10,7 +11,7 @@ from starlette import status
 from app.crud import UserCRUD
 from app.database import get_db
 from app.models import User
-from app.utils.security import verify_token
+from app.utils.security import verify_token, create_access_token
 
 security = HTTPBearer()
 
@@ -77,6 +78,40 @@ def check_user_role(required_roles: List[str]):
 
     return role_checker
 
+
+def hash_password(password: str) -> str:
+    """비밀번호 해시화"""
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
+def verify_password(password: str, hashed_password: str) -> bool:
+    """비밀번호 검증"""
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+def get_temp_user(
+        credentials: HTTPAuthorizationCredentials = Depends(security),
+        db: Session = Depends(get_db)
+) -> Optional[dict]:
+    """임시 토큰에서 카카오 사용자 정보 추출 (회원가입 완료용)"""
+    token = credentials.credentials
+    payload = verify_token(token)
+
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # 임시 토큰인지 확인
+    if payload.get("type") != "temp":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid temp token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return payload.get("kakao_user")
 
 # 편의를 위한 미리 정의된 dependency들
 require_admin = check_user_role(["admin"])
