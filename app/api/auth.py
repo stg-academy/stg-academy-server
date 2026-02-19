@@ -11,10 +11,10 @@ from ..schemas.user import (
     UserCreate, UserResponse, KakaoLoginRequest, KakaoLoginResponse,
     GeneralLoginRequest, GeneralLoginResponse, GeneralRegisterRequest,
     GeneralRegisterResponse, KakaoRegisterRequest, KakaoRegisterResponse,
-    UsernameCheckResponse
+    UsernameCheckResponse, ManualRegisterRequest, ManualRegisterResponse
 )
 from ..crud.user import UserCRUD
-from ..utils.auth import get_current_user, hash_password, verify_password, get_temp_user
+from ..utils.auth import get_current_user, hash_password, verify_password, get_temp_user, require_admin
 from ..utils.security import create_access_token
 from ..config import settings
 
@@ -131,6 +131,7 @@ async def general_login(request: GeneralLoginRequest, db: Session = Depends(get_
         }
     }
 
+
 @router.post("/register", response_model=GeneralRegisterResponse)
 async def general_register(request: GeneralRegisterRequest, db: Session = Depends(get_db)):
     # 사용자명 중복 확인
@@ -164,8 +165,10 @@ async def general_register(request: GeneralRegisterRequest, db: Session = Depend
         }
     }
 
+
 @router.post("/kakao/register", response_model=KakaoRegisterResponse)
-async def kakao_register(request: KakaoRegisterRequest, kakao_user: dict = Depends(get_temp_user), db: Session = Depends(get_db)):
+async def kakao_register(request: KakaoRegisterRequest, kakao_user: dict = Depends(get_temp_user),
+                         db: Session = Depends(get_db)):
     # 이미 등록된 카카오 사용자인지 확인
     existing_kakao_user = UserCRUD.get_user_by_kakao_id(db, kakao_user["kakao_id"])
     if existing_kakao_user:
@@ -199,6 +202,7 @@ async def kakao_register(request: KakaoRegisterRequest, kakao_user: dict = Depen
         }
     }
 
+
 @router.get("/username", response_model=UsernameCheckResponse)
 async def check_username(username: str = Query(...), db: Session = Depends(get_db)):
     existing_user = UserCRUD.get_user_by_username(db, username)
@@ -214,9 +218,44 @@ async def check_username(username: str = Query(...), db: Session = Depends(get_d
             "message": "사용 가능한 아이디입니다"
         }
 
+
+@router.post("/manual/register", response_model=ManualRegisterResponse)
+async def manual_register(
+        request: ManualRegisterRequest,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(require_admin)
+):
+    # 사용자명 중복 확인
+    existing_user = UserCRUD.get_user_by_username(db, request.username)
+    if existing_user:
+        raise HTTPException(status_code=409, detail="Username already exists")
+
+    # 관리자가 직접 사용자 생성
+    user_create = UserCreate(
+        username=request.username,
+        auth_type="manual",
+        information=request.information,
+        authorizations={"role": request.auth}
+    )
+
+    user = UserCRUD.create_user(db, user_create)
+
+    return {
+        "user": {
+            "id": str(user.id),
+            "username": user.username,
+            "auth_type": user.auth_type,
+            "information": user.information,
+            "auth": request.auth,
+            "created_at": user.created_at.isoformat()
+        }
+    }
+
+
 @router.post("/logout")
 async def logout():
     return {"message": "Successfully logged out"}
+
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: User = Depends(get_current_user)):

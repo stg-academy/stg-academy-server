@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionDetailResponse
 from ..crud.session import SessionCRUD
-from ..utils.auth import get_current_user
+from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/sessions", tags=["sessions"])
 async def create_session(
         session_data: SessionCreate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     return SessionCRUD.create_session(db, session_data, current_user)
 
@@ -42,7 +42,7 @@ async def update_session(
         session_id: UUID,
         session_update: SessionUpdate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     session_obj = SessionCRUD.update_session(db, session_id, session_update)
     if not session_obj:
@@ -53,7 +53,7 @@ async def update_session(
 async def delete_session(
         session_id: UUID,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     success = SessionCRUD.delete_session(db, session_id)
     if not success:

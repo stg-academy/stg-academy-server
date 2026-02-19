@@ -3,7 +3,7 @@ from .user import (
     UserCreate, UserUpdate, UserResponse, UserInfoResponse,
     KakaoLoginRequest, KakaoLoginResponse, GeneralLoginRequest, GeneralLoginResponse,
     GeneralRegisterRequest, GeneralRegisterResponse, KakaoRegisterRequest,
-    KakaoRegisterResponse, UsernameCheckResponse
+    KakaoRegisterResponse, UsernameCheckResponse, ManualRegisterRequest, ManualRegisterResponse
 )
 from .course import CourseCreate, CourseUpdate, CourseResponse
 from .lecture import LectureCreate, LectureUpdate, LectureResponse
@@ -16,7 +16,7 @@ __all__ = [
     "UserCreate", "UserUpdate", "UserResponse", "UserInfoResponse",
     "KakaoLoginRequest", "KakaoLoginResponse", "GeneralLoginRequest", "GeneralLoginResponse",
     "GeneralRegisterRequest", "GeneralRegisterResponse", "KakaoRegisterRequest",
-    "KakaoRegisterResponse", "UsernameCheckResponse",
+    "KakaoRegisterResponse", "UsernameCheckResponse", "ManualRegisterRequest", "ManualRegisterResponse",
     # Course
     "CourseCreate", "CourseUpdate", "CourseResponse",
     # Session

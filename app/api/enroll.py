@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.enroll import EnrollCreate, EnrollUpdate, EnrollResponse, EnrollDetailResponse
 from ..crud.enroll import EnrollCRUD
-from ..utils.auth import get_current_user
+from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/enrolls", tags=["enrolls"])
 
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/enrolls", tags=["enrolls"])
 async def create_enroll(
     enroll: EnrollCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
     try:
         return EnrollCRUD.create_enroll(db, enroll, current_user)
@@ -53,7 +53,7 @@ async def update_enroll(
     enroll_id: UUID,
     enroll_update: EnrollUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin)
 ):
     enroll = EnrollCRUD.update_enroll(db, enroll_id, enroll_update, current_user)
     if not enroll:

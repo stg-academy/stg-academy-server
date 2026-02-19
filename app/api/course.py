@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.course import CourseCreate, CourseUpdate, CourseResponse, CourseInfoResponse
 from ..crud.course import CourseCRUD
-from ..utils.auth import get_current_user
+from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/courses", tags=["courses"])
 
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/courses", tags=["courses"])
 async def create_course(
         course: CourseCreate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     return CourseCRUD.create_course(db, course, current_user)
 
@@ -42,7 +42,7 @@ async def update_course(
         course_id: UUID,
         course_update: CourseUpdate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     course = CourseCRUD.update_course(db, course_id, course_update, current_user)
     if not course:

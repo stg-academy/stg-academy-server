@@ -47,7 +47,6 @@ class GeneralLoginResponse(BaseModel):
 class GeneralRegisterRequest(BaseModel):
     username: str
     password: str
-    display_name: str
     information: str
 
 class GeneralRegisterResponse(BaseModel):
@@ -65,6 +64,14 @@ class KakaoRegisterResponse(BaseModel):
 class UsernameCheckResponse(BaseModel):
     available: bool
     message: str
+
+class ManualRegisterRequest(BaseModel):
+    username: str
+    information: str
+    auth: str
+
+class ManualRegisterResponse(BaseModel):
+    user: Dict[str, Any]
 
 class UserInfoResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

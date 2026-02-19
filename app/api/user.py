@@ -15,7 +15,8 @@ router = APIRouter(prefix="/api/users", tags=["users"])
 async def get_users_info(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin)  # admin 권한 요구
 ):
     users = UserCRUD.get_active_users(db, skip=skip, limit=limit)
     return users
@@ -48,7 +49,7 @@ async def update_user(
         user_id: UUID,
         user_update: UserUpdate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     user = UserCRUD.update_user(db, user_id, user_update)
     if not user:
@@ -60,7 +61,7 @@ async def update_user(
 async def delete_user(
         user_id: UUID,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     success = UserCRUD.delete_user(db, user_id)
     if not success:

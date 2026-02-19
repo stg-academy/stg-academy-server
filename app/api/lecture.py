@@ -7,7 +7,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.lecture import LectureCreate, LectureUpdate, LectureResponse
 from ..crud.lecture import LectureCRUD
-from ..utils.auth import get_current_user
+from ..utils.auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/lectures", tags=["lectures"])
 
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/lectures", tags=["lectures"])
 async def create_lecture(
         lecture: LectureCreate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     return LectureCRUD.create_lecture(db, lecture, current_user)
 
@@ -51,7 +51,7 @@ async def update_lecture(
         lecture_id: UUID,
         lecture_update: LectureUpdate,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     lecture = LectureCRUD.update_lecture(db, lecture_id, lecture_update, current_user)
     if not lecture:
@@ -62,7 +62,7 @@ async def update_lecture(
 async def delete_lecture(
         lecture_id: UUID,
         db: Session = Depends(get_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     success = LectureCRUD.delete_lecture(db, lecture_id)
     if not success:
